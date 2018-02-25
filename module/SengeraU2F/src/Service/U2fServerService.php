@@ -187,8 +187,6 @@ class U2fServerService {
      * @param array $requests An array of outstanding authentication requests
      * @param array $registrations An array of current registrations
      * @param object $response A response from the authenticator
-     * @return Registration
-     * @throws Error
      *
      * The Registration object returned on success contains an updated counter
      * that should be saved for future authentications.
@@ -198,11 +196,13 @@ class U2fServerService {
     public function doAuthenticate(array $requests, array $registrations, $response)
     {
         if( !is_object( $response ) ) {
-            throw new \InvalidArgumentException('$response of doAuthenticate() method only accepts object.');
+            //throw new \InvalidArgumentException('$response of doAuthenticate() method only accepts object.');
+            return false;
         }
 
         if( property_exists( $response, 'errorCode') && $response->errorCode !== 0 ) {
-            throw new Error('User-agent returned error. Error code: ' . $response->errorCode, ERR_BAD_UA_RETURNING );
+            //throw new Error('User-agent returned error. Error code: ' . $response->errorCode, ERR_BAD_UA_RETURNING );
+            return false;
         }
 
         /** @var object|null $req */
@@ -215,7 +215,8 @@ class U2fServerService {
         $decodedClient = json_decode($clientData);
         foreach ($requests as $req) {
             if( !is_object( $req ) ) {
-                throw new \InvalidArgumentException('$requests of doAuthenticate() method only accepts array of object.');
+                //throw new \InvalidArgumentException('$requests of doAuthenticate() method only accepts array of object.');
+                return false;
             }
 
             if($req->keyHandle === $response->keyHandle && $req->challenge === $decodedClient->challenge) {
@@ -225,11 +226,13 @@ class U2fServerService {
             $req = null;
         }
         if($req === null) {
-            throw new Error('No matching request found', ERR_NO_MATCHING_REQUEST );
+            //throw new Error('No matching request found', ERR_NO_MATCHING_REQUEST );
+            return false;
         }
         foreach ($registrations as $reg) {
             if( !is_object( $reg ) ) {
-                throw new \InvalidArgumentException('$registrations of doAuthenticate() method only accepts array of object.');
+                //throw new \InvalidArgumentException('$registrations of doAuthenticate() method only accepts array of object.');
+                return false;
             }
 
             if($reg->keyHandle === $response->keyHandle) {
@@ -238,11 +241,13 @@ class U2fServerService {
             $reg = null;
         }
         if($reg === null) {
-            throw new Error('No matching registration found', ERR_NO_MATCHING_REGISTRATION );
+            //throw new Error('No matching registration found', ERR_NO_MATCHING_REGISTRATION );
+            return false;
         }
         $pemKey = $this->pubkey_to_pem($this->base64u_decode($reg->publicKey));
         if($pemKey === null) {
-            throw new Error('Decoding of public key failed', ERR_PUBKEY_DECODE );
+            //throw new Error('Decoding of public key failed', ERR_PUBKEY_DECODE );
+            return false;
         }
 
         $signData = $this->base64u_decode($response->signatureData);
@@ -259,10 +264,12 @@ class U2fServerService {
                 $reg->counter = $counter;
                 return $reg;
             } else {
-                throw new Error('Counter too low.', ERR_COUNTER_TOO_LOW );
+                //throw new Error('Counter too low.', ERR_COUNTER_TOO_LOW );
+                return false;
             }
         } else {
-            throw new Error('Authentication failed', ERR_AUTHENTICATION_FAILURE );
+            //throw new Error('Authentication failed', ERR_AUTHENTICATION_FAILURE );
+            return false;
         }
     }
 

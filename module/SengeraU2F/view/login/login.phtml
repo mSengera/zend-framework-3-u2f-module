@@ -1,0 +1,47 @@
+<div class="row">
+    <?php if($this->messages): ?>
+        <div class="col-md-12">
+            <div class="alert alert-danger">
+                <?php foreach($this->messages as $message): ?>
+                    <strong>Error:</strong> <?php echo $message; ?><br />
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <div class="col-md-6">
+        <h1>Login</h1>
+        <p>Login now with your existing account.</p>
+
+        <?= $this->form()->openTag($form); ?>
+        <table class="table table-responsive">
+            <tr>
+                <td>
+                    <?= $this->formLabel($form->get('email')); ?>
+                </td>
+                <td>
+                    <?= $this->formElement($form->get('email')); ?>
+                    <?= $this->formElementErrors($form->get('email')); ?>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <?= $this->formLabel($form->get('password')); ?>
+                </td>
+                <td>
+                    <?= $this->formElement($form->get('password')); ?>
+                    <?= $this->formElementErrors($form->get('password')); ?>
+                </td>
+            </tr>
+        </table>
+
+        <?= $this->formElement($form->get('submit')); ?>
+
+        <?= $this->form()->closeTag(); ?>
+    </div>
+    <div class="col-md-6">
+        <h1>Or create a new account.</h1>
+        <p>Create a new account. Its free!</p>
+        <a href="<?php echo $this->basePath(); ?>/register" class="btn btn-primary">Register now!</a>
+    </div>
+</div>

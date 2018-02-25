@@ -26,6 +26,10 @@ New Urls to reach:
 - `Zend\View`
 
 ## Changelog
+##### 1.1.0
+- Add login functions
+- Login after registrations works basically
+
 ##### 1.0.0
 - Base Version
 - Registration works basically
