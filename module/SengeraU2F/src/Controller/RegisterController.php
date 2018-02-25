@@ -125,7 +125,11 @@ class RegisterController extends AbstractActionController
             $entityManager->persist($user);
             $entityManager->flush();
 
+            /*
+             * Hurray registrated!
+             */
             echo 'Perfect! You are now registered.';
+
             return $this->getResponse();
         }
 

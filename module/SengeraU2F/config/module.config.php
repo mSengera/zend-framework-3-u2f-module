@@ -2,21 +2,51 @@
 namespace SengeraU2F;
 
 use Zend\Router\Http\Literal;
-use Zend\ServiceManager\Factory\InvokableFactory;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 return [
     'controllers' => [
         'factories' => [
-            Controller\U2FController::class => InvokableFactory::class,
             Controller\RegisterController::class => Controller\ControllerFactory::class,
+            Controller\LoginController::class => Controller\ControllerFactory::class,
         ],
         'aliases' => [
             'Controller\Register' => Controller\RegisterController::class,
+            'Controller\Login' => Controller\LoginController::class,
         ],
     ],
     'router' => [
         'routes' => [
+            'login-normal' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/login',
+                    'defaults' => [
+                        'controller' => Controller\LoginController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+            'login-u2f' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/login-u2f',
+                    'defaults' => [
+                        'controller' => Controller\LoginController::class,
+                        'action'     => 'u2f',
+                    ],
+                ],
+            ],
+            'login-u2f-do' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/login-u2f-do',
+                    'defaults' => [
+                        'controller' => Controller\LoginController::class,
+                        'action'     => 'do',
+                    ],
+                ],
+            ],
             'register-normal' => [
                 'type' => Literal::class,
                 'options' => [
@@ -37,7 +67,7 @@ return [
                     ],
                 ],
             ],
-            'u2f-do' => [
+            'register-u2f-do' => [
                 'type' => Literal::class,
                 'options' => [
                     'route'    => '/register-u2f-do',
@@ -53,6 +83,8 @@ return [
         'template_map' => [
             'sengera-u2-f/register/index' => __DIR__ . '/../view/register/register.phtml',
             'sengera-u2-f/register/u2f' => __DIR__ . '/../view/register/register-u2f.phtml',
+            'sengera-u2-f/login/index' => __DIR__ .'/../view/login/login.phtml',
+            'sengera-u2-f/login/u2f' => __DIR__ .'/../view/login/login-u2f.phtml'
         ],
     ],
     'service_manager' => [
