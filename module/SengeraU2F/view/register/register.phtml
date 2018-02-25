@@ -4,6 +4,15 @@ $form->prepare();
 ?>
 
 <div class="row">
+    <?php if($this->messages): ?>
+        <div class="col-md-12">
+            <div class="alert alert-danger">
+                <?php foreach($this->messages as $message): ?>
+                    <strong>Error:</strong> <?php echo $message; ?><br />
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
     <div class="col-md-6">
         <h1>Register</h1>
         <p>Register today!</p>
@@ -17,6 +26,7 @@ $form->prepare();
                 <td>
                     <?= $this->formElement($form->get('email')); ?>
                     <?= $this->formElementErrors($form->get('email')); ?>
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                 </td>
             </tr>
             <tr>
@@ -26,11 +36,13 @@ $form->prepare();
                 <td>
                     <?= $this->formElement($form->get('password')); ?>
                     <?= $this->formElementErrors($form->get('password')); ?>
+                    <small id="passHelp" class="form-text text-muted">Please choose a password longer than 8 characters.</small>
 
-                    <br />
+                    <br /><br />
 
                     <?= $this->formElement($form->get('repeat-password')); ?>
                     <?= $this->formElementErrors($form->get('repeat-password')); ?>
+                    <small id="passwdHelp" class="form-text text-muted">Please repeat your password.</small>
                 </td>
             </tr>
         </table>
@@ -40,16 +52,3 @@ $form->prepare();
         <?= $this->form()->closeTag(); ?>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
