@@ -44,6 +44,7 @@ New Urls to reach:
 - Simple backend with logout button
 - New counter write after login in database
 - Clean U2fServerService
+- Main menu bar: check if user is logged in, change login and register to logout button
 
 ## Contact
 Marvin Sengera  
