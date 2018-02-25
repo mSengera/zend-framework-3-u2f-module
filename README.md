@@ -1,6 +1,8 @@
 # Sengera U2F Module
 This is an integration of the FIDO U2F Standard as registration for the Zend Framework 3. 
 
+Current version: **1.1.0**
+
 ## Installation
 1. Download or clone repository
 2. Copy all files to your project
