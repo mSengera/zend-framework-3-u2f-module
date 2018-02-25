@@ -39,6 +39,12 @@ New Urls to reach:
 - Base Version
 - Registration works basically
 
+## ToDo
+- Exception Handling
+- Simple backend with logout button
+- New counter write after login in database
+- Clean U2fServerService
+
 ## Contact
 Marvin Sengera  
 work@marvin-sengera.de  
