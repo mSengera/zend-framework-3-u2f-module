@@ -1,0 +1,55 @@
+<?php
+$form = $this->form;
+$form->prepare();
+?>
+
+<div class="row">
+    <div class="col-md-6">
+        <h1>Register</h1>
+        <p>Register today!</p>
+
+        <?= $this->form()->openTag($form); ?>
+        <table class="table table-responsive">
+            <tr>
+                <td>
+                    <?= $this->formLabel($form->get('email')); ?>
+                </td>
+                <td>
+                    <?= $this->formElement($form->get('email')); ?>
+                    <?= $this->formElementErrors($form->get('email')); ?>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <?= $this->formLabel($form->get('password')); ?>
+                </td>
+                <td>
+                    <?= $this->formElement($form->get('password')); ?>
+                    <?= $this->formElementErrors($form->get('password')); ?>
+
+                    <br />
+
+                    <?= $this->formElement($form->get('repeat-password')); ?>
+                    <?= $this->formElementErrors($form->get('repeat-password')); ?>
+                </td>
+            </tr>
+        </table>
+
+        <?= $this->formElement($form->get('submit')); ?>
+
+        <?= $this->form()->closeTag(); ?>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+

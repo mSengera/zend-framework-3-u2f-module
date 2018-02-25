@@ -1,0 +1,35 @@
+<?php
+$this->headScript()->appendFile($this->basePath() .'/js/u2f-api.js', 'text/javascript');
+?>
+
+<h1>Register a U2F Device</h1>
+<p>Register a U2F device as second authentification factor for your safety.</p>
+
+<p>Please insert your Yubi FIDO U2F key and touch it.</p>
+
+<?php var_dump($this->u2f_data);?>
+
+<pre id="response"></pre>
+
+<script>
+    window.u2f.register([
+            {
+                version : "<?php echo $this->u2f_data[0]->version; ?>",
+                challenge : "<?php echo $this->u2f_data[0]->challenge; ?>",
+                appId : "<?php echo $this->u2f_data[0]->appId; ?>"
+            }
+        ], [], function (data) {
+            console.log(data);
+
+            $.post("<?php echo $this->basePath(); ?>/register-u2f-do", {
+                registrationData: data.registrationData,
+                clientData: data.clientData,
+                errorCode: data.errorCode,
+                challenge: "<?php echo $this->u2f_data[0]->challenge; ?>",
+                appId: "<?php echo $this->u2f_data[0]->appId; ?>"
+            }, function(data) {
+                $('#response').html(data.toString())
+            });
+        }
+    );
+</script>

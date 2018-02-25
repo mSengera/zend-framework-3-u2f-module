@@ -1,10 +1,15 @@
 # Ignore everything
-*
+/*
 
-# But not these files...
 !.gitignore
 !composer.json
 
-# if the files to be tracked are in subdirectories
-!*/module/SengeraU2F/*
-!*/js/u2f-api.js
+!/module/
+/module/*
+!/module/SengeraU2f
+
+!/public/
+/public/*
+!/public/js/
+/public/js/*
+!/public/js/u2f-api.js
