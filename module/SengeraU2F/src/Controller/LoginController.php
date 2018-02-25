@@ -107,10 +107,12 @@ class LoginController extends AbstractActionController {
             $loginResponseService = $this->getServiceManager()->get('U2fLoginResponse');
             $loginResponseService->init($data['clientData'], $data['keyHandle'], $data['signatureData'], $data['errorCode']);
 
-            if(!$this->u2fServerService->doAuthenticate(array($signRequestService), array($registrationService), $loginResponseService)) {
+            if(!$counter = $this->u2fServerService->doAuthenticate(array($signRequestService), array($registrationService), $loginResponseService)) {
                 $this->flashMessenger()->addMessage('Something with your token went wront. Please try again with right token.');
                 return $this->redirect()->toRoute('login-normal');
             }
+
+            echo $counter->counter;
 
             /*
              * Hurray Logged In!
