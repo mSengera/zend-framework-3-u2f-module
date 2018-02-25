@@ -76,7 +76,6 @@ class RegisterController extends AbstractActionController
             }
 
             $sessionContainer = $this->getServiceManager()->get('user_session');
-
             $sessionContainer->username = $data['email'];
             $sessionContainer->password = $data['password'];
 
