@@ -33,7 +33,7 @@ New Urls to reach:
 ## Contact
 Marvin Sengera  
 work@marvin-sengera.de  
-Visit: marvin-sengera.de
+Visit: http://marvin-sengera.de
 
 ##### Copyright
 &copy;  Marvin Sengera - 2018
