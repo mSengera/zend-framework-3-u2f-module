@@ -15,7 +15,7 @@ Current version: **1.1.0**
 New Urls to reach:
 - `/register` - Register Form with Emailadress and Password
 - `/register-u2f` - Register Form for an FIDO U2F Key
-- `/register-u2f-do` - AJAX Action for FIDO U2F Javascript Call#
+- `/register-u2f-do` - AJAX Action for FIDO U2F Javascript Call
 - `/login` - Login Form with Emailadress and Password
 - `/login-u2f` - Second factor login with FIDO U2F Key
 - `/login-u2f-do` - AJAX Action for FIDO U2F Javascript Call
