@@ -19,8 +19,6 @@ $this->headScript()->appendFile($this->basePath() .'/js/u2f-api.js', 'text/javas
                 appId : "<?php echo $this->u2f_data[0]->appId; ?>"
             }
         ], [], function (data) {
-            console.log(data);
-
             $.post("<?php echo $this->basePath(); ?>/register-u2f-do", {
                 registrationData: data.registrationData,
                 clientData: data.clientData,

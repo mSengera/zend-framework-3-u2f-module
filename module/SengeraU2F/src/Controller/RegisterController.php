@@ -81,8 +81,12 @@ class RegisterController extends AbstractActionController
 
             $this->u2fServerService = $this->getServiceManager()->get('U2fServer');
             $this->u2fServerService->init('https://localhost');
+            $this->u2fServerService->controller = $this;
 
-            $data = $this->u2fServerService->getRegisterData($this->getServiceManager()->get('U2fRegisterRequest'));
+            if(!$data = $this->u2fServerService->getRegisterData($this->getServiceManager()->get('U2fRegisterRequest'))) {
+                $this->flashMessenger()->addMessage('Something went wrong. Please try again.');
+                return $this->redirect()->toRoute('register-normal');
+            }
 
             $view = new ViewModel([
                 'u2f_data' => $data
@@ -128,7 +132,7 @@ class RegisterController extends AbstractActionController
             /*
              * Hurray registrated!
              */
-            echo 'Perfect! You are now registered.';
+            echo 'Perfect! You are now registrated.';
 
             return $this->getResponse();
         }

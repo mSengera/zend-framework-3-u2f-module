@@ -18,6 +18,9 @@ class U2fServerService {
         'ca993121846c464d666096d35f13bf44c1b05af205f9b4a1e00cf6cc10c5e511'
     );
 
+    /** @var  \SengeraU2F\Controller\RegisterController */
+    public $controller;
+
     /**
      * @param string $appId Application id for the running application
      * @param string|null $attestDir Directory where trusted attestation roots may be found
@@ -25,8 +28,9 @@ class U2fServerService {
      */
     public function init($appId, $attestDir = null) {
         if(OPENSSL_VERSION_NUMBER < 0x10000000) {
-            //throw new Error('OpenSSL has to be at least version 1.0.0, this is ' . OPENSSL_VERSION_TEXT, ERR_OLD_OPENSSL);
+            $this->controller->addMessage('OpenSSL has to be at least version 1.0.0, this is '. OPENSSL_VERSION_TEXT);
         }
+
         $this->appId = $appId;
         $this->attestDir = $attestDir;
     }
@@ -58,29 +62,25 @@ class U2fServerService {
      * @param object $response response from a user
      * @param bool $includeCert set to true if the attestation certificate should be
      * included in the returned Registration object
-     * @return Registration
+     * @return Registration | Bool
      * @throws Error
      */
     public function doRegister($request, $response, $u2fRegistrationService, $includeCert = true)
     {
         if( !is_object( $request ) ) {
-            //throw new \InvalidArgumentException('$request of doRegister() method only accepts object.');
-            die('ERROR');
+            return false;
         }
 
         if( !is_object( $response ) ) {
-            //throw new \InvalidArgumentException('$response of doRegister() method only accepts object.');
-            die('ERROR');
+            return false;
         }
 
         if( property_exists( $response, 'errorCode') && $response->errorCode !== 0 ) {
-            //throw new Error('User-agent returned error. Error code: ' . $response->errorCode, ERR_BAD_UA_RETURNING );
-            die('ERROR');
+            return false;
         }
 
         if( !is_bool( $includeCert ) ) {
-           //throw new \InvalidArgumentException('$include_cert of doRegister() method only accepts boolean.');
-            die('ERROR');
+            return false;
         }
 
         $rawReg = $this->base64u_decode($response->registrationData);
@@ -89,24 +89,21 @@ class U2fServerService {
         $cli = json_decode($clientData);
 
         if($cli->challenge !== $request->challenge) {
-            //throw new Error('Registration challenge does not match', ERR_UNMATCHED_CHALLENGE );
-            die('ERROR');
+            $this->controller->addMessage('Registration challenge does not match.');
+            return false;
         }
-
-
-
-
 
         $registration = $u2fRegistrationService;
         $offs = 1;
         $pubKey = substr($rawReg, $offs, PUBKEY_LEN);
         $offs += PUBKEY_LEN;
+
         // decode the pubKey to make sure it's good
         $tmpKey = $this->pubkey_to_pem($pubKey);
 
         if($tmpKey === null) {
-            //throw new Error('Decoding of public key failed', ERR_PUBKEY_DECODE );
-            die('ERROR');
+            $this->controller->addMessage('Decoding of public key failed');
+            return false;
         }
 
         $registration->publicKey = base64_encode($pubKey);
@@ -125,20 +122,23 @@ class U2fServerService {
         $pemCert  = "-----BEGIN CERTIFICATE-----\r\n";
         $pemCert .= chunk_split(base64_encode($rawCert), 64);
         $pemCert .= "-----END CERTIFICATE-----";
+
         if($includeCert) {
             $registration->certificate = base64_encode($rawCert);
         }
+
         if($this->attestDir) {
             if(openssl_x509_checkpurpose($pemCert, -1, $this->get_certs()) !== true) {
-                //throw new Error('Attestation certificate can not be validated', ERR_ATTESTATION_VERIFICATION );
-                die('ERROR');
+                $this->controller->addMessage('Attestation certificate can not be validated');
+                return false;
             }
         }
 
         if(!openssl_pkey_get_public($pemCert)) {
-            //throw new Error('Decoding of public key failed', ERR_PUBKEY_DECODE );
-            die('ERROR');
+            $this->controller->addMessage('Decoding of public key failed');
+            return false;
         }
+
         $signature = substr($rawReg, $offs);
 
         $dataToVerify  = chr(0);
@@ -150,8 +150,8 @@ class U2fServerService {
         if(openssl_verify($dataToVerify, $signature, $pemCert, 'sha256') === 1) {
             return $registration;
         } else {
-            //throw new Error('Attestation signature does not match', ERR_ATTESTATION_SIGNATURE );
-            die('ERROR');
+            $this->controller->addMessage('Attestation signature does not match');
+            return false;
         }
     }
 
@@ -159,7 +159,7 @@ class U2fServerService {
      * Called to get an authentication request.
      *
      * @param array $registrations An array of the registrations to create authentication requests for.
-     * @return array An array of SignRequest
+     * @return array An array of SignRequest | Bool
      * @throws Error
      */
     public function getAuthenticateData(array $registrations)
@@ -168,8 +168,7 @@ class U2fServerService {
         $challenge = $this->createChallenge();
         foreach ($registrations as $reg) {
             if( !is_object( $reg ) ) {
-                //throw new \InvalidArgumentException('$registrations of getAuthenticateData() method only accepts array of object.');
-                die('ERROR');
+                return false;
             }
 
             $sig = new SignRequest();
@@ -178,6 +177,7 @@ class U2fServerService {
             $sig->challenge = $challenge;
             $sigs[] = $sig;
         }
+
         return $sigs;
     }
 
@@ -196,12 +196,10 @@ class U2fServerService {
     public function doAuthenticate(array $requests, array $registrations, $response)
     {
         if( !is_object( $response ) ) {
-            //throw new \InvalidArgumentException('$response of doAuthenticate() method only accepts object.');
             return false;
         }
 
         if( property_exists( $response, 'errorCode') && $response->errorCode !== 0 ) {
-            //throw new Error('User-agent returned error. Error code: ' . $response->errorCode, ERR_BAD_UA_RETURNING );
             return false;
         }
 
@@ -213,9 +211,9 @@ class U2fServerService {
 
         $clientData = $this->base64u_decode($response->clientData);
         $decodedClient = json_decode($clientData);
+
         foreach ($requests as $req) {
             if( !is_object( $req ) ) {
-                //throw new \InvalidArgumentException('$requests of doAuthenticate() method only accepts array of object.');
                 return false;
             }
 
@@ -225,13 +223,13 @@ class U2fServerService {
 
             $req = null;
         }
+
         if($req === null) {
-            //throw new Error('No matching request found', ERR_NO_MATCHING_REQUEST );
             return false;
         }
+
         foreach ($registrations as $reg) {
             if( !is_object( $reg ) ) {
-                //throw new \InvalidArgumentException('$registrations of doAuthenticate() method only accepts array of object.');
                 return false;
             }
 
@@ -241,12 +239,10 @@ class U2fServerService {
             $reg = null;
         }
         if($reg === null) {
-            //throw new Error('No matching registration found', ERR_NO_MATCHING_REGISTRATION );
             return false;
         }
         $pemKey = $this->pubkey_to_pem($this->base64u_decode($reg->publicKey));
         if($pemKey === null) {
-            //throw new Error('Decoding of public key failed', ERR_PUBKEY_DECODE );
             return false;
         }
 
@@ -259,16 +255,14 @@ class U2fServerService {
         if(openssl_verify($dataToVerify, $signature, $pemKey, 'sha256') === 1) {
             $ctr = unpack("Nctr", substr($signData, 1, 4));
             $counter = $ctr['ctr'];
-            /* TODO: wrap-around should be handled somehow.. */
+
             if($counter > $reg->counter) {
                 $reg->counter = $counter;
                 return $reg;
             } else {
-                //throw new Error('Counter too low.', ERR_COUNTER_TOO_LOW );
                 return false;
             }
         } else {
-            //throw new Error('Authentication failed', ERR_AUTHENTICATION_FAILURE );
             return false;
         }
     }
@@ -348,7 +342,7 @@ class U2fServerService {
     {
         $challenge = openssl_random_pseudo_bytes(32, $crypto_strong );
         if( $crypto_strong !== true ) {
-            throw new Error('Unable to obtain a good source of randomness', ERR_BAD_RANDOM);
+            return false;
         }
 
         $challenge = $this->base64u_encode( $challenge );
