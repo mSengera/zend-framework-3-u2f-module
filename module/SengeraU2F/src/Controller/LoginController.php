@@ -8,6 +8,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Validator;
+use Zend\Escaper\Escaper;
 
 class LoginController extends AbstractActionController {
 
@@ -69,6 +70,19 @@ class LoginController extends AbstractActionController {
             $this->u2fServerService->init('https://localhost');
 
             $data = $this->u2fServerService->getRegisterData($this->getServiceManager()->get('U2fRegisterRequest'));
+
+            /*
+             * Escape all data for safe output
+             */
+            $escaper = new Escaper();
+
+            // Escape $data array
+            foreach($data as $key => $item) {
+                $data[$key] = $escaper->escapeJs($item);
+            }
+
+            // Escape $sessionContainer->keyhandle variable
+            $sessionContainer->keyhandle = $escaper->escapeJs($sessionContainer->keyhandle);
 
             $view = new ViewModel([
                 'data' => $data,

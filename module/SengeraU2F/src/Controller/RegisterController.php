@@ -15,6 +15,7 @@ use Zend\View\Model\ViewModel;
 use Zend\ServiceManager\ServiceManager;
 
 use Zend\Validator;
+use Zend\Escaper\Escaper;
 
 class RegisterController extends AbstractActionController
 {
