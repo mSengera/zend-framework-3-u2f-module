@@ -1,7 +1,8 @@
 # Sengera U2F Module
-This is an integration of the FIDO U2F Standard as registration for the Zend Framework 3. 
+This is an integration of the FIDO U2F Standard as registration for the Zend Framework 3. I programmed it for my 
+bachelor thesis "Integration und Beschreibung der U2F Authentifikation in das Zend Framework".
 
-Current version: **1.1.0**
+Current version: **1.2.0**
 
 ## Installation
 1. Download or clone repository
@@ -23,6 +24,8 @@ New Urls to reach:
 ## Requirements
 - `Doctrine\ORM\Mapping`
 - `Interop\Container`
+- `Zend\Crypt\Password\Bcrypt`
+- `Zend\Escaper\Escaper`
 - `Zend\Form`
 - `Zend\Mvc\Controller`
 - `Zend\ServiceManager`
@@ -31,6 +34,11 @@ New Urls to reach:
 - `Zend\View`
 
 ## Changelog
+##### 1.2.0
+- Major security fixes
+- Small bugfixes
+- Basic error handling
+
 ##### 1.1.0
 - Add login functions
 - Login after registrations works basically
@@ -39,12 +47,19 @@ New Urls to reach:
 - Base Version
 - Registration works basically
 
+##### 0.0.1
+- Basic installation
+- Very basic structure
+
 ## ToDo
-- Exception Handling
 - Simple backend with logout button
 - New counter write after login in database
 - Clean U2fServerService
 - Main menu bar: check if user is logged in, change login and register to logout button
+- Forgot password functionality
+- Ability to add a second U2F device to user account. Function: Mark a key as primary
+- Ability to delete U2F devices from user account
+- Email notification, if "not primary" U2F device is used for authentication, cause of security reasons
 
 ## Contact
 Marvin Sengera  
