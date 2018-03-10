@@ -24,8 +24,8 @@ New URLs to reach:
 ## Requirements
 - `Doctrine\ORM\Mapping`
 - `Interop\Container`
-- `Zend\Crypt\Password\Bcrypt`
-- `Zend\Escaper\Escaper`
+- `Zend\Crypt`
+- `Zend\Escaper`
 - `Zend\Form`
 - `Zend\Mvc\Controller`
 - `Zend\ServiceManager`
