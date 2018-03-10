@@ -13,7 +13,7 @@ Current version: **1.2.0**
 6. Check configurations for required modules. (e.g. doctrine database credentials, zend cache configuration [...])
 
 ## URLs
-New Urls to reach:
+New URLs to reach:
 - `/register` - Register Form with Emailadress and Password
 - `/register-u2f` - Register Form for an FIDO U2F Key
 - `/register-u2f-do` - AJAX Action for FIDO U2F Javascript Call
