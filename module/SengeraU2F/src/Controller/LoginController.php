@@ -137,7 +137,10 @@ class LoginController extends AbstractActionController {
                 return $this->redirect()->toRoute('login-normal');
             }
 
-            echo $counter->counter;
+            if($counter->counter <= $sessionContainer->counter) {
+                $this->flashMessenger()->addMessage('Something with your token went wront. Your token isnt longer safe. It was duplicated. Please contact the support.');
+                return $this->redirect()->toRoute('login-normal');
+            }
 
             /*
              * Hurray Logged In!
