@@ -9,6 +9,7 @@ use Zend\View\Model\ViewModel;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Validator;
 use Zend\Escaper\Escaper;
+use Zend\Crypt\Password\Bcrypt;
 
 class LoginController extends AbstractActionController {
 
