@@ -8,6 +8,8 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Validator;
+use Zend\Escaper\Escaper;
+use Zend\Crypt\Password\Bcrypt;
 
 class LoginController extends AbstractActionController {
 
@@ -26,7 +28,13 @@ class LoginController extends AbstractActionController {
      */
     public function indexAction()
     {
-        $form = new LoginForm();
+        // CSRF Protection
+        $csrfToken = bin2hex(random_bytes(32));
+
+        $sessionContainer = $this->getServiceManager()->get('user_session');
+        $sessionContainer->csrfToken = $csrfToken;
+
+        $form = new LoginForm($csrfToken);
 
         return new ViewModel([
             'form' => $form,
@@ -41,6 +49,13 @@ class LoginController extends AbstractActionController {
         if($this->getRequest()->isPost()) {
             $validator = new Validator\EmailAddress();
             $data = $this->params()->fromPost();
+            $sessionContainer = $this->getServiceManager()->get('user_session');
+
+            // Check CSRF Token
+            if($data['token'] != $sessionContainer->csrfToken) {
+                $this->flashMessenger()->addMessage('Wrong session key. Please reload and try again.');
+                return $this->redirect()->toRoute('login-normal');
+            }
 
             if(!$validator->isValid($data['email']) || $data['email'] == '') {
                 $this->flashMessenger()->addMessage('Wrong login credentials. Please try again.');
@@ -51,12 +66,14 @@ class LoginController extends AbstractActionController {
 
             $user = $entityManager->getRepository(User::class)->findByUsername($data['email']);
 
-            if($data['password'] != $user[0]->getPassword()) {
+            $bcrypt = new Bcrypt();
+            $securePass = $user[0]->getPassword();
+            $password = $data['password'];
+
+            if (!$bcrypt->verify($password, $securePass)) {
                 $this->flashMessenger()->addMessage('Wrong login credentials. Please try again.');
                 return $this->redirect()->toRoute('login-normal');
             }
-
-            $sessionContainer = $this->getServiceManager()->get('user_session');
 
             $sessionContainer->logged_in = true;
             $sessionContainer->username = $user[0]->getUsername();
@@ -69,6 +86,19 @@ class LoginController extends AbstractActionController {
             $this->u2fServerService->init('https://localhost');
 
             $data = $this->u2fServerService->getRegisterData($this->getServiceManager()->get('U2fRegisterRequest'));
+
+            /*
+             * Escape all data for safe output
+             */
+            $escaper = new Escaper();
+
+            // Escape $data array
+            foreach($data as $key => $item) {
+                $data[$key] = $escaper->escapeJs($item);
+            }
+
+            // Escape $sessionContainer->keyhandle variable
+            $sessionContainer->keyhandle = $escaper->escapeJs($sessionContainer->keyhandle);
 
             $view = new ViewModel([
                 'data' => $data,
@@ -112,7 +142,10 @@ class LoginController extends AbstractActionController {
                 return $this->redirect()->toRoute('login-normal');
             }
 
-            echo $counter->counter;
+            if($counter->counter <= $sessionContainer->counter) {
+                $this->flashMessenger()->addMessage('Something with your token went wront. Your token isnt longer safe. It was duplicated. Please contact the support.');
+                return $this->redirect()->toRoute('login-normal');
+            }
 
             /*
              * Hurray Logged In!
