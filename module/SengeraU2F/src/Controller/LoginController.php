@@ -65,7 +65,11 @@ class LoginController extends AbstractActionController {
 
             $user = $entityManager->getRepository(User::class)->findByUsername($data['email']);
 
-            if($data['password'] != $user[0]->getPassword()) {
+            $bcrypt = new Bcrypt();
+            $securePass = $user[0]->getPassword();
+            $password = $data['password'];
+
+            if (!$bcrypt->verify($password, $securePass)) {
                 $this->flashMessenger()->addMessage('Wrong login credentials. Please try again.');
                 return $this->redirect()->toRoute('login-normal');
             }

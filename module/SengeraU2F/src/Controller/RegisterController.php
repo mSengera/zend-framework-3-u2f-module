@@ -15,7 +15,7 @@ use Zend\View\Model\ViewModel;
 use Zend\ServiceManager\ServiceManager;
 
 use Zend\Validator;
-use Zend\Escaper\Escaper;
+use Zend\Crypt\Password\Bcrypt;
 
 class RegisterController extends AbstractActionController
 {
@@ -119,9 +119,16 @@ class RegisterController extends AbstractActionController
 
             $sessionContainer = $this->getServiceManager()->get('user_session');
 
+            $bcrypt = new Bcrypt([
+                'salt' => bin2hex(random_bytes(32)),
+                'cost' => 11
+            ]);
+
+            $password = $bcrypt->create($sessionContainer->password);
+
             $user = new User();
             $user->setUsername($sessionContainer->username);
-            $user->setPassword($sessionContainer->password);
+            $user->setPassword($password);
             $user->setKeyhandle($registration->keyHandle);
             $user->setPublicKey($registration->publicKey);
             $user->setCertificate($registration->certificate);
