@@ -27,7 +27,13 @@ class LoginController extends AbstractActionController {
      */
     public function indexAction()
     {
-        $form = new LoginForm();
+        // CSRF Protection
+        $csrfToken = bin2hex(random_bytes(32));
+
+        $sessionContainer = $this->getServiceManager()->get('user_session');
+        $sessionContainer->csrfToken = $csrfToken;
+
+        $form = new LoginForm($csrfToken);
 
         return new ViewModel([
             'form' => $form,
@@ -42,6 +48,13 @@ class LoginController extends AbstractActionController {
         if($this->getRequest()->isPost()) {
             $validator = new Validator\EmailAddress();
             $data = $this->params()->fromPost();
+            $sessionContainer = $this->getServiceManager()->get('user_session');
+
+            // Check CSRF Token
+            if($data['token'] != $sessionContainer->csrfToken) {
+                $this->flashMessenger()->addMessage('Wrong session key. Please reload and try again.');
+                return $this->redirect()->toRoute('login-normal');
+            }
 
             if(!$validator->isValid($data['email']) || $data['email'] == '') {
                 $this->flashMessenger()->addMessage('Wrong login credentials. Please try again.');
@@ -56,8 +69,6 @@ class LoginController extends AbstractActionController {
                 $this->flashMessenger()->addMessage('Wrong login credentials. Please try again.');
                 return $this->redirect()->toRoute('login-normal');
             }
-
-            $sessionContainer = $this->getServiceManager()->get('user_session');
 
             $sessionContainer->logged_in = true;
             $sessionContainer->username = $user[0]->getUsername();

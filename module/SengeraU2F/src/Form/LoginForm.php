@@ -5,12 +5,17 @@ use Zend\Form\Form;
 
 class LoginForm extends Form
 {
-    public function __construct()
+
+    // CSRF Protection
+    private $csrfToken;
+
+    public function __construct($csrfToken)
     {
         parent::__construct('login-form');
         $this->setAttribute('method', 'post');
         $this->setAttribute('action', '/login-u2f');
 
+        $this->csrfToken = $csrfToken;
         $this->_addElements();
     }
 
@@ -40,6 +45,17 @@ class LoginForm extends Form
             ],
             'options' => [
                 'label' => 'Password',
+            ],
+        ]);
+
+        // CSRF Protection
+        $this->add([
+            'type'  => 'hidden',
+            'name' => 'token',
+            'attributes' => [
+                'id'  => 'token',
+                'required' => 'required',
+                'value' => $this->csrfToken
             ],
         ]);
 
