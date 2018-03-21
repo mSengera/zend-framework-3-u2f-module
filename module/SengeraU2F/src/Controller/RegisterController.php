@@ -43,8 +43,9 @@ class RegisterController extends AbstractActionController
     /**
      * @return ViewModel
      */
-    public function indexAction()
-    {
+    public function indexAction() {
+        $this->_redirectUserIfLoggedIn();
+
         $form = new RegisterForm();
 
         return new ViewModel([
@@ -57,6 +58,8 @@ class RegisterController extends AbstractActionController
      * @return ViewModel
      */
     public function u2fAction() {
+        $this->_redirectUserIfLoggedIn();
+
         if($this->getRequest()->isPost()) {
             $validator = new Validator\EmailAddress();
             $data = $this->params()->fromPost();
@@ -135,17 +138,31 @@ class RegisterController extends AbstractActionController
             $user->setCounter($registration->counter);
 
             $entityManager->persist($user);
-            $entityManager->flush();
+            try {
+                $entityManager->flush();
+            } catch(\Exception $e) {
+                echo $e->getMessage();
+            }
 
             /*
              * Hurray registrated!
              */
-            echo 'Perfect! You are now registrated.';
+            echo 'Perfect! You are now registrated.<br />Please go back and start login!';
 
             return $this->getResponse();
         }
 
         return $this->redirect()->toRoute('register-normal');
+    }
+
+    private function _redirectUserIfLoggedIn() {
+        $sessionContainer = $this->getServiceManager()->get('user_session');
+
+        if($sessionContainer->logged_in != true) {
+            return true;
+        } else {
+            return $this->redirect()->toRoute('dashboard');
+        }
     }
 
     /* =================================================================================================================

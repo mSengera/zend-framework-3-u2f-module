@@ -9,10 +9,12 @@ return [
         'factories' => [
             Controller\RegisterController::class => Controller\ControllerFactory::class,
             Controller\LoginController::class => Controller\ControllerFactory::class,
+            Controller\DashboardController::class => Controller\ControllerFactory::class,
         ],
         'aliases' => [
             'Controller\Register' => Controller\RegisterController::class,
             'Controller\Login' => Controller\LoginController::class,
+            'Controller\Dashboard' => Controller\DashboardController::class,
         ],
     ],
     'router' => [
@@ -47,6 +49,16 @@ return [
                     ],
                 ],
             ],
+            'logout' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/logout',
+                    'defaults' => [
+                        'controller' => Controller\LoginController::class,
+                        'action'     => 'logout',
+                    ],
+                ],
+            ],
             'register-normal' => [
                 'type' => Literal::class,
                 'options' => [
@@ -77,6 +89,16 @@ return [
                     ],
                 ],
             ],
+            'dashboard' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/dashboard',
+                    'defaults' => [
+                        'controller' => Controller\DashboardController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ]
         ],
     ],
     'view_manager' => [
@@ -84,7 +106,8 @@ return [
             'sengera-u2-f/register/index' => __DIR__ . '/../view/register/register.phtml',
             'sengera-u2-f/register/u2f' => __DIR__ . '/../view/register/register-u2f.phtml',
             'sengera-u2-f/login/index' => __DIR__ .'/../view/login/login.phtml',
-            'sengera-u2-f/login/u2f' => __DIR__ .'/../view/login/login-u2f.phtml'
+            'sengera-u2-f/login/u2f' => __DIR__ .'/../view/login/login-u2f.phtml',
+            'sengera-u2-f/dashboard/index' => __DIR__ .'/../view/dashboard/dashboard.phtml'
         ],
     ],
     'service_manager' => [

@@ -5,7 +5,7 @@ $this->headScript()->appendFile($this->basePath() .'/js/u2f-api.js', 'text/javas
 <h1>Second Factor Authentication</h1>
 <p>Please insert your Yubi FIDO U2F key and touch it.</p>
 
-<pre id="response"></pre>
+<div id="response"></div>
 
 <script>
     window.u2f.sign([{
@@ -14,8 +14,6 @@ $this->headScript()->appendFile($this->basePath() .'/js/u2f-api.js', 'text/javas
         appId : "<?php echo $this->data[0]->appId; ?>",
         keyHandle: "<?php echo $this->keyhandle; ?>"
     }], function (data) {
-        console.log(data);
-
         $.post("<?php echo $this->basePath(); ?>/login-u2f-do", {
             clientData: data.clientData,
             errorCode: data.errorCode,

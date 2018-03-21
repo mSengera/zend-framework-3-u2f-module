@@ -13,7 +13,7 @@ class LoginForm extends Form
     {
         parent::__construct('login-form');
         $this->setAttribute('method', 'post');
-        $this->setAttribute('action', '/login-u2f');
+        $this->setAttribute('action', '/fido-to-zend/public/login-u2f');
 
         $this->csrfToken = $csrfToken;
         $this->_addElements();

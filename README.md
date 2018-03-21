@@ -2,7 +2,7 @@
 This is an integration of the FIDO U2F Standard as registration for the Zend Framework 3. I programmed it for my 
 bachelor thesis "Integration und Beschreibung der U2F Authentifikation in das Zend Framework".
 
-Current version: **1.2.0**
+Current version: **2.0.0**
 
 ## Installation
 1. Download or clone repository
@@ -11,6 +11,7 @@ Current version: **1.2.0**
 4. Copy `public/js/u2f-api.js` file into same direction in your project
 5. Check requirements. Install modules if needed
 6. Check configurations for required modules. (e.g. doctrine database credentials, zend cache configuration [...])
+7. Integrate into your applications workflow
 
 ## URLs
 New URLs to reach:
@@ -20,6 +21,8 @@ New URLs to reach:
 - `/login` - Login Form with Emailadress and Password
 - `/login-u2f` - Second factor login with FIDO U2F Key
 - `/login-u2f-do` - AJAX Action for FIDO U2F Javascript Call
+- `/dashboard` - Simple dashboard for logged in users
+- `/logout` - Logout action
 
 ## Requirements
 - `Doctrine\ORM\Mapping`
@@ -34,6 +37,12 @@ New URLs to reach:
 - `Zend\View`
 
 ## Changelog
+##### 2.0.0
+- Add simple backend
+- Add logout function
+- Important login security fixes
+- Add logged_in session variable for further use
+
 ##### 1.2.0
 - Major security fixes
 - Small bugfixes

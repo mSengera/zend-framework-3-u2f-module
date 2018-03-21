@@ -26,8 +26,9 @@ class LoginController extends AbstractActionController {
     /**
      * @return ViewModel
      */
-    public function indexAction()
-    {
+    public function indexAction() {
+        $this->_redirectUserIfLoggedIn();
+
         // CSRF Protection
         $csrfToken = bin2hex(random_bytes(32));
 
@@ -46,6 +47,8 @@ class LoginController extends AbstractActionController {
      * @return ViewModel
      */
     public function u2fAction() {
+        $this->_redirectUserIfLoggedIn();
+
         if($this->getRequest()->isPost()) {
             $validator = new Validator\EmailAddress();
             $data = $this->params()->fromPost();
@@ -75,7 +78,6 @@ class LoginController extends AbstractActionController {
                 return $this->redirect()->toRoute('login-normal');
             }
 
-            $sessionContainer->logged_in = true;
             $sessionContainer->username = $user[0]->getUsername();
             $sessionContainer->publicKey = $user[0]->getPublicKey();
             $sessionContainer->keyhandle = $user[0]->getKeyhandle();
@@ -91,11 +93,6 @@ class LoginController extends AbstractActionController {
              * Escape all data for safe output
              */
             $escaper = new Escaper();
-
-            // Escape $data array
-            foreach($data as $key => $item) {
-                $data[$key] = $escaper->escapeJs($item);
-            }
 
             // Escape $sessionContainer->keyhandle variable
             $sessionContainer->keyhandle = $escaper->escapeJs($sessionContainer->keyhandle);
@@ -117,6 +114,12 @@ class LoginController extends AbstractActionController {
     public function doAction() {
         if($this->getRequest()->isPost()) {
             $data = $this->params()->fromPost();
+
+            if(isset($data['errorCode'])) {
+                $this->flashMessenger()->addMessage('Something with your token went wront. Please try again with right token.');
+                echo '<script>window.location.replace("/fido-to-zend/public/login");</script>';
+                return $this->getResponse();
+            }
 
             $this->u2fServerService = $this->getServiceManager()->get('U2fServer');
             $this->u2fServerService->init('https://localhost');
@@ -150,12 +153,31 @@ class LoginController extends AbstractActionController {
             /*
              * Hurray Logged In!
              */
-            echo 'Perfect! You are now logged in.';
+            $sessionContainer->logged_in = true;
+            echo '<script>window.location.replace("/fido-to-zend/public/dashboard");</script>';
 
             return $this->getResponse();
         }
 
         return $this->redirect()->toRoute('login-normal');
+    }
+
+    public function logoutAction() {
+        $sessionContainer = $this->getServiceManager()->get('user_session');
+        $sessionContainer->exchangeArray(array());
+
+        $this->flashMessenger()->addMessage('Logged out successfully.');
+        return $this->redirect()->toRoute('home');
+    }
+
+    private function _redirectUserIfLoggedIn() {
+        $sessionContainer = $this->getServiceManager()->get('user_session');
+
+        if($sessionContainer->logged_in != true) {
+            return true;
+        } else {
+            return $this->redirect()->toRoute('dashboard');
+        }
     }
 
     /* =================================================================================================================

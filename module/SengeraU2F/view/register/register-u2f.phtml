@@ -7,9 +7,7 @@ $this->headScript()->appendFile($this->basePath() .'/js/u2f-api.js', 'text/javas
 
 <p>Please insert your Yubi FIDO U2F key and touch it.</p>
 
-<?php var_dump($this->u2f_data);?>
-
-<pre id="response"></pre>
+<div id="response"></div>
 
 <script>
     window.u2f.register([
