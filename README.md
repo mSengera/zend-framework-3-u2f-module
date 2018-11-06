@@ -71,7 +71,6 @@ New URLs to reach:
 
 ## Contact
 Marvin Sengera  
-work@marvin-sengera.de  
 Visit: http://marvin-sengera.de
 
 ##### Copyright
